@@ -8,20 +8,61 @@ const pool = new Pool({
     port: 5432
 });
 
+
+// USERS **
+const createUser = (req,res) =>{
+    const {username, password} = req.body;
+    console.log("user db: ", username, " pass db: ", password);
+    pool.query("INSERT INTO users (username, password) VALUES ($1, $2)", [username, password], (err, data) => {
+        if(err){
+            res.status(400).json("Error: " + err);
+        }
+        return res.status(201).send("Added user");
+    })
+}
+
+const getUser = (req,res) =>{
+ 
+    pool.query("SELECT * FROM users", (err, data) => {
+        if(err){
+            res.status(400).json("Error: " + err);
+        }
+        console.log(data.rows);
+        return res.status(201).json(data.rows);
+    })
+}
+
+const getUserWithId = (req,res) =>{
+    const {username, password} = req.body;
+    const user = "'" + username + "'";
+    const pass = "'" + password + "'";
+    console.log("user: ", user, " pass: ", pass);
+    pool.query("SELECT * FROM users WHERE username = $1 AND password = $2", [user, pass], (err, data) => {
+        if(err){
+            res.status(400).json("Error: " + err);
+        }
+        //console.log(data.rows);
+        return res.status(201).json(data.rows);
+    })
+}
+
+
 /** COLLECTIONS */
 const createCollection = (req,res) =>{
-    const {name, description} = req.body;
-    pool.query("INSERT INTO collections (name, description, date) VALUES ($1, $2, CURRENT_TIMESTAMP)", [name, description], (err, data) => {
+    const {name, description, user_id} = req.body;
+    pool.query("INSERT INTO collections (name, description, date, user_id) VALUES ($1, $2, CURRENT_TIMESTAMP, $3)", [name, description, user_id], (err, data) => {
         if(err){
-            return res.status(400).json("Error: " + err);
+            res.status(400).json("Error: " + err);
         }
         return res.status(201).send("Collection added with ID: ${data.insertId}");
         
     })
 }
 
-const getCollections = (req,res) =>{
-    pool.query("SELECT * FROM collections ORDER BY date ASC", (err, data) => {
+const getCollections = (req,res) =>{ // where user_id == id mandado ********
+    const id = parseInt(req.params.id);
+    console.log("id?? ", id);
+    pool.query("SELECT * FROM collections WHERE user_id = $1",[id],(err, data) => {
         if(err){
             res.status(400).json("Error: " + err);
         }
@@ -117,6 +158,7 @@ const deleteItem = (req,res) =>{
     })
 }
 
+
 module.exports = {
     createCollection,
     getCollections,
@@ -127,5 +169,8 @@ module.exports = {
     getItems,
     getItemsById,
     updateItems,
-    deleteItem
+    deleteItem,
+    createUser,
+    getUser,
+    getUserWithId
 }

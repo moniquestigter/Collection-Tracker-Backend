@@ -16,19 +16,25 @@ app.get("/", (req,res) => {
    res.json({ info: "PSQL API"})
 })
 
+/* USERS */
+app.get("/users", db.getUser);
+app.get("/users/:id", db.getUserWithId);
+app.post("/users", db.createUser);
+
 /** CONNECT TO FUNCTION QUERIES */
-app.get("/collections", db.getCollections);
-app.get("/collections/:id", db.getCollectionById);
-app.post("/collections", db.createCollection);
-app.put("/collections/:id", db.updateCollection);
-app.delete("/collections/:id", db.deleteCollection);
+app.get("/:id/collections", db.getCollections); // add user id before??
+app.get("/:id/collections/:id", db.getCollectionById);
+app.post("/:id/collections", db.createCollection);
+app.put("/:id/collections/:id", db.updateCollection);
+app.delete("/:id/collections/:id", db.deleteCollection);
 
 /* ITEMSS*/
-app.get("/:id/items", db.getItems);
-app.get("/:id/items/:id", db.getItemsById);
-app.post("/:id/items", db.createItem);
-app.put("/:id/items/:id", db.updateItems);
-app.delete("/:id/items/:id", db.deleteItem);
+app.get("/:id/collections/:id/items", db.getItems);
+app.get("/:id/collections/:id/items/:id", db.getItemsById);
+app.post("/:id/collections/:id/items", db.createItem);
+app.put("/:id/collections/:id/items/:id", db.updateItems);
+app.delete("/:id/collections/:id/items/:id", db.deleteItem);
+
 
 
 app.listen(port, () => {
