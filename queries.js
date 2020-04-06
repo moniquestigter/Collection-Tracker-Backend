@@ -36,10 +36,9 @@ const getUserWithId = (req,res) =>{
     const {username, password} = req.body;
     const user = "'" + username + "'";
     const pass = "'" + password + "'";
-    console.log("user: ", user, " pass: ", pass);
     pool.query("SELECT * FROM users WHERE username = $1 AND password = $2", [user, pass], (err, data) => {
         if(err){
-            res.status(400).json("Error: " + err);
+            return res.status(400).json("Error: " + err);
         }
         //console.log(data.rows);
         return res.status(201).json(data.rows);
@@ -52,7 +51,7 @@ const createCollection = (req,res) =>{
     const {name, description, user_id} = req.body;
     pool.query("INSERT INTO collections (name, description, date, user_id) VALUES ($1, $2, CURRENT_TIMESTAMP, $3)", [name, description, user_id], (err, data) => {
         if(err){
-            res.status(400).json("Error: " + err);
+            return res.status(400).json("Error: " + err);
         }
         return res.status(201).send("Collection added with ID: ${data.insertId}");
         
@@ -64,7 +63,7 @@ const getCollections = (req,res) =>{ // where user_id == id mandado ********
     console.log("id?? ", id);
     pool.query("SELECT * FROM collections WHERE user_id = $1",[id],(err, data) => {
         if(err){
-            res.status(400).json("Error: " + err);
+            return res.status(400).json("Error: " + err);
         }
         return res.status(201).json(data.rows);
     })
@@ -115,12 +114,11 @@ const createItem = (req,res) =>{
 }
 
 const getItems = (req,res) =>{
-    //console.log(req.params.id);
     const id = parseInt(req.params.id);
 
     pool.query("select * from items where collection_id = $1", [id], (err, data) => {
         if(err){
-            res.status(400).json("Error: " + err);
+            return res.status(400).json("Error: " + err);
         }
         return res.status(200).json(data.rows);
     })
